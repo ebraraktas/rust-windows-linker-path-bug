@@ -1,0 +1,25 @@
+name: rust-windows-link-bug
+on:
+  workflow_dispatch:
+    inputs:
+      old_rust:
+        required: true
+        description: Use rust 1.64.0
+        type: boolean
+        default: false
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+      - name: Install rust 1.64.0
+        shell: cmd
+        if: ${{ inputs.old_rust }}
+        run: |
+          rustup install 1.64.0 && rustup default 1.64.0-x86_64-pc-windows-msvc
+      - name: Build
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
+          set "PATH=C:\msys64\usr\bin;%PATH%"
+          rustup toolchain list
+          git clone https://github.com/dtolnay/proc-macro2 && cd proc-macro2 && cargo build
